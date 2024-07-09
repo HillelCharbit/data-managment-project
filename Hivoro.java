@@ -198,8 +198,6 @@ public class Hivoro extends JPanel {
     public static void main(String[] args) {
         CSVReader reader = new CSVReader();
         String csvFile = "C:\\Users\\danie\\Food_Inspections_-_1_1_2010_-_6_30_2018_20240704.csv";
-        // String csvFile = "C:\\Users\\ASUS\\Downloads\\Food_Inspections_-_1_1_2010_-_6_30_2018_20240704.csv";
-
         int k = 10; // Number of lines to read
         double[][] data = reader.readCSV(csvFile, k);
 
@@ -233,5 +231,4 @@ public class Hivoro extends JPanel {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
-    
 }

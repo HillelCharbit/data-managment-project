@@ -23,21 +23,26 @@ public class VisualizeUncoveredRegions extends JPanel {
         // Adjust the scaling factors as needed to fit the points in the window
         int scale = getWidth();
 
-        // Draw the grid and circles
+        // Draw the grid
         for (int i = 0; i < getWidth(); i++) {
             for (int j = 0; j < getHeight(); j++) {
                 Point2D.Double testPoint = new Point2D.Double((double) i / scale, (double) j / scale);
-                boolean covered = false;
-                for (Point2D point : allPoints) {
-                    if (testPoint.distance(point) <= radius) {
-                        covered = true;
-                        break;
+                boolean inCommonArea = false;
+                for (int m = 0; m < allPoints.size(); m++) {
+                    for (int n = m + 1; n < allPoints.size(); n++) {
+                        Point2D p1 = allPoints.get(m);
+                        Point2D p2 = allPoints.get(n);
+                        if (p1.distance(p2) <= 2 * radius && testPoint.distance(p1) <= radius && testPoint.distance(p2) <= radius) {
+                            inCommonArea = true;
+                            break;
+                        }
                     }
+                    if (inCommonArea) break;
                 }
-                if (covered) {
-                    g2d.setColor(new Color(0, 255, 0, 50)); // light green
+                if (inCommonArea) {
+                    g2d.setColor(new Color(0, 255, 0, 50)); // light green for common area
                 } else {
-                    g2d.setColor(new Color(255, 0, 0, 50)); // light red
+                    g2d.setColor(new Color(255, 0, 0, 50)); // light red for the rest
                 }
                 g2d.fillRect(i, j, 1, 1);
             }
@@ -51,13 +56,7 @@ public class VisualizeUncoveredRegions extends JPanel {
 
             g2d.setColor(Color.BLACK);
             g2d.draw(new Ellipse2D.Double(x - r / 2, y - r / 2, r, r));
-
-            if (uncoveredPoints.contains(point)) {
-                g2d.setColor(Color.RED);
-            } else {
-                g2d.setColor(Color.GREEN);
-            }
-            g2d.fillOval(x - 5, y - 5, 10, 10);
+            g2d.fillOval(x - 3, y - 3, 6, 6); // black points
         }
     }
 
