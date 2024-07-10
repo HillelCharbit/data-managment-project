@@ -1,7 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Point2D;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
 import java.util.List;
 
 public class VisualizeUncoveredRegions extends JPanel {
@@ -16,7 +16,7 @@ public class VisualizeUncoveredRegions extends JPanel {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
 
-        List<Point2D> uncoveredPoints = uncoveredRegion.identifyUncoveredRegions();
+        List<Point2D> uncoveredPoints = uncoveredRegion.getUncoveredPoints();
         List<Point2D> allPoints = uncoveredRegion.getPoints();
         double radius = uncoveredRegion.getRadius();
 
