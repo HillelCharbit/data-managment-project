@@ -26,6 +26,7 @@ public class UncoveredRegion2D {
         return new ArrayList<>();
     }
 
+    // Method to calculate uncovered regions based on the pseudocode
     public void calculateUncoveredRegions() {
         uncoveredPoints.clear();
 
@@ -58,21 +59,5 @@ public class UncoveredRegion2D {
 
     public double getRadius() {
         return radius;
-    }
-}
-
-class VoronoiCell {
-    private List<Point2D> vertices;
-
-    public VoronoiCell() {
-        vertices = new ArrayList<>();
-    }
-
-    public void addVertex(Point2D vertex) {
-        vertices.add(vertex);
-    }
-
-    public List<Point2D> getVertices() {
-        return vertices;
     }
 }

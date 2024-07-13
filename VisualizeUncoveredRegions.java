@@ -23,26 +23,21 @@ public class VisualizeUncoveredRegions extends JPanel {
         // Adjust the scaling factors as needed to fit the points in the window
         int scale = getWidth();
 
-        // Draw the grid
+        // Draw the grid and circles
         for (int i = 0; i < getWidth(); i++) {
             for (int j = 0; j < getHeight(); j++) {
                 Point2D.Double testPoint = new Point2D.Double((double) i / scale, (double) j / scale);
-                boolean inCommonArea = false;
-                for (int m = 0; m < allPoints.size(); m++) {
-                    for (int n = m + 1; n < allPoints.size(); n++) {
-                        Point2D p1 = allPoints.get(m);
-                        Point2D p2 = allPoints.get(n);
-                        if (p1.distance(p2) <= 2 * radius && testPoint.distance(p1) <= radius && testPoint.distance(p2) <= radius) {
-                            inCommonArea = true;
-                            break;
-                        }
+                boolean covered = false;
+                for (Point2D point : allPoints) {
+                    if (testPoint.distance(point) <= radius) {
+                        covered = true;
+                        break;
                     }
-                    if (inCommonArea) break;
                 }
-                if (inCommonArea) {
-                    g2d.setColor(new Color(0, 255, 0, 50)); // light green for common area
+                if (covered) {
+                    g2d.setColor(new Color(0, 255, 0, 50)); // light green
                 } else {
-                    g2d.setColor(new Color(255, 0, 0, 50)); // light red for the rest
+                    g2d.setColor(new Color(255, 0, 0, 50)); // light red
                 }
                 g2d.fillRect(i, j, 1, 1);
             }
