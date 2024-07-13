@@ -211,15 +211,18 @@ public class Hivoro extends JPanel {
             ur.addPoint(point[0], point[1]);
         }
 
+        // Measure the calculation time for uncovering regions
+        long startTime = System.nanoTime();
+        ur.calculateUncoveredRegions();
+        long endTime = System.nanoTime();
+        long calculationTime = (endTime - startTime) / 1000000;
+        System.out.println("Calculation time: " + calculationTime + " ms");
+
         // Create the main JFrame for Voronoi and uncovered regions visualization
         JFrame frame = new JFrame("Hivoro and Uncovered Regions Visualization");
 
         // Add the Voronoi panel
-        long startTime = System.nanoTime();
         Hivoro hivoro = new Hivoro(data);
-        long endTime = System.nanoTime();
-        long totalTime = (endTime - startTime) / 1000000;
-        System.out.println(totalTime);
         frame.add(hivoro);
 
         // Create and add the uncovered regions visualization panel
