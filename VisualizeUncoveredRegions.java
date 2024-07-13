@@ -9,6 +9,7 @@ public class VisualizeUncoveredRegions extends JPanel {
 
     public VisualizeUncoveredRegions(UncoveredRegion2D ur) {
         this.uncoveredRegion = ur;
+        setPreferredSize(new Dimension(800, 800));
     }
 
     @Override
@@ -64,7 +65,7 @@ public class VisualizeUncoveredRegions extends JPanel {
         JFrame frame = new JFrame("Uncovered Regions Visualization");
         VisualizeUncoveredRegions panel = new VisualizeUncoveredRegions(ur);
         frame.add(panel);
-        frame.setSize(800, 600);
+        frame.setSize(800, 800);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }

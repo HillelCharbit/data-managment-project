@@ -1,6 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
-
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Hivoro extends JPanel {
     Color backgroundColor, textColor;
@@ -16,21 +20,21 @@ public class Hivoro extends JPanel {
     double[] bisectorY = new double[100000];
     double[] unused = new double[100000];
     Cell[] cells;
+    List<Integer> selectedIndices = new ArrayList<>();
+    JFrame frame;
 
-    public Hivoro(double[][] data) {
+    public Hivoro(double[][] data, JFrame frame) {
         this.data = data;
+        this.frame = frame;
         backgroundColor = Color.black;
         textColor = Color.yellow;
         lineColors[0] = Color.green;
         lineColors[1] = Color.white;
-
-        // lineColors[2] = Color.black;
-
         lineColors[2] = new Color(199, 111, 238);
         width = 800;
-        height = 600;
+        height = 800;
         numPoints = data.length;
-        cells = new Cell[numPoints * (numPoints - 1) / 2 ];
+        cells = new Cell[numPoints * (numPoints - 1) / 2];
 
         for (int k = 0; k < numPoints; k++) {
             xCoords[k] = data[k][0] * (width - 30) + 15;
@@ -40,6 +44,38 @@ public class Hivoro extends JPanel {
             distances[k] = Math.pow(xCoords[k] * xCoords[k] + yCoords[k] * yCoords[k], 0.5);
         }
         heapSort(distances, xCoords, yCoords, numPoints);
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int x = e.getX();
+                int y = e.getY();
+                for (int i = 0; i < numPoints; i++) {
+                    if (Math.abs(x - xIntCoords[i]) <= 5 && Math.abs(y - yIntCoords[i]) <= 5) {
+                        if (!selectedIndices.contains(i)) {
+                            selectedIndices.add(i);
+                            if (selectedIndices.size() == 2) {
+                                updateVoronoiCellVisualizer();
+                                selectedIndices.clear();
+                            }
+                        }
+                        break;
+                    }
+                }
+                repaint();
+            }
+        });
+    }
+
+    private void updateVoronoiCellVisualizer() {
+        int index1 = selectedIndices.get(0);
+        int index2 = selectedIndices.get(1);
+        Cell selectedCell = new Cell(new Point2D.Double(xCoords[index1], yCoords[index1]), new Point2D.Double(xCoords[index2], yCoords[index2]));
+        Point2D intersectionPoint = calculateIntersection(selectedCell);
+        frame.getContentPane().remove(1);
+        frame.add(new VoronoiCellVisualizer(selectedCell, intersectionPoint), 1);
+        frame.revalidate();
+        frame.repaint();
     }
 
     public double power(double base, double exponent) {
@@ -99,6 +135,21 @@ public class Hivoro extends JPanel {
         }
     }
 
+    public Cell[] getCells() {
+        return cells;
+    }
+
+    public Point2D calculateIntersection(Cell cell) {
+        if (cell == null) {
+            return null;
+        }
+        Point2D p1 = cell.getPoint1();
+        Point2D p2 = cell.getPoint2();
+        double midX = (p1.getX() + p2.getX()) / 2;
+        double midY = (p1.getY() + p2.getY()) / 2;
+        return new Point2D.Double(midX, midY);
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -108,10 +159,15 @@ public class Hivoro extends JPanel {
         g.drawString("N=" + numPoints, 15, 15);
         for (int k = 0; k < numPoints; k++) {
             g.fillOval(xIntCoords[k] - 2, yIntCoords[k] - 2, 4, 4);
+            if (selectedIndices.contains(k)) {
+                g.setColor(Color.RED);
+                g.drawOval(xIntCoords[k] - 5, yIntCoords[k] - 5, 10, 10);
+                g.setColor(textColor);
+            }
         }
 
         int cellIndex = 0;
-        
+
         for (int i = 1; i <= numPoints - 1; i++) {
             for (int j = i + 1; j <= numPoints; j++) {
                 double slope1 = (yCoords[i - 1] - yCoords[j - 1]) / (xCoords[i - 1] - xCoords[j - 1]);
@@ -196,6 +252,13 @@ public class Hivoro extends JPanel {
                         int y2Int = (int) (bisectorY[next - 1] + 0.5);
                         g.setColor(lineColors[closerPointsCount]);
                         g.drawLine(x1Int, y1Int, x2Int, y2Int);
+
+                        // Add the points to the cells array
+                        if (cellIndex < cells.length) {
+                            cells[cellIndex] = new Cell(new Point2D.Double(bisectorX[k - 1], bisectorY[k - 1]),
+                                    new Point2D.Double(bisectorX[next - 1], bisectorY[next - 1]));
+                            cellIndex++;
+                        }
                     }
                 }
             }
@@ -208,9 +271,8 @@ public class Hivoro extends JPanel {
         int k = 10; // Number of lines to read
         double[][] data = reader.readCSV(csvFile, k);
 
-        // Prompt the user for the value of k
-        String kStr = JOptionPane.showInputDialog("Enter the value of k:");
-        int kValue = Integer.parseInt(kStr);
+        // Default value for k
+        int kValue = 30;
 
         // Create UncoveredRegion2D instance and add points from data
         UncoveredRegion2D ur = new UncoveredRegion2D(0.1, kValue);
@@ -222,11 +284,7 @@ public class Hivoro extends JPanel {
         JFrame frame = new JFrame("Hivoro and Uncovered Regions Visualization");
 
         // Add the Voronoi panel
-        long startTime = System.nanoTime();
-        Hivoro hivoro = new Hivoro(data);
-        long endTime = System.nanoTime();
-        long totalTime = (endTime - startTime) / 1000000;
-        System.out.println(totalTime);
+        Hivoro hivoro = new Hivoro(data, frame);
         frame.add(hivoro);
 
         // Create and add the uncovered regions visualization panel
@@ -234,7 +292,7 @@ public class Hivoro extends JPanel {
         frame.add(urPanel);
 
         frame.setLayout(new GridLayout(1, 2)); // Arrange panels side by side
-        frame.setSize(1600, 800); // Adjust the size to accommodate both panels
+        frame.setSize(1600, 800); // Adjust the size to accommodate all panels
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
