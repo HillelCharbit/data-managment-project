@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 
+
 public class Hivoro extends JPanel {
     Color backgroundColor, textColor;
     int numPoints, height, width;
@@ -14,6 +15,7 @@ public class Hivoro extends JPanel {
     double[] bisectorX = new double[100000];
     double[] bisectorY = new double[100000];
     double[] unused = new double[100000];
+    Cell[] cells;
 
     public Hivoro(double[][] data) {
         this.data = data;
@@ -21,12 +23,14 @@ public class Hivoro extends JPanel {
         textColor = Color.yellow;
         lineColors[0] = Color.green;
         lineColors[1] = Color.white;
+
         // lineColors[2] = Color.black;
 
         lineColors[2] = new Color(199, 111, 238);
         width = 800;
         height = 600;
         numPoints = data.length;
+        cells = new Cell[numPoints * (numPoints - 1) / 2 ];
 
         for (int k = 0; k < numPoints; k++) {
             xCoords[k] = data[k][0] * (width - 30) + 15;
@@ -105,6 +109,9 @@ public class Hivoro extends JPanel {
         for (int k = 0; k < numPoints; k++) {
             g.fillOval(xIntCoords[k] - 2, yIntCoords[k] - 2, 4, 4);
         }
+
+        int cellIndex = 0;
+        
         for (int i = 1; i <= numPoints - 1; i++) {
             for (int j = i + 1; j <= numPoints; j++) {
                 double slope1 = (yCoords[i - 1] - yCoords[j - 1]) / (xCoords[i - 1] - xCoords[j - 1]);
