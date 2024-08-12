@@ -1,10 +1,25 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from shapely.geometry import LineString, MultiLineString
+from matplotlib.patches import Polygon as MplPolygon
+from matplotlib.collections import PatchCollection
+from shapely.geometry import LineString, MultiLineString, Point
 from shapely.ops import polygonize, unary_union
 from matplotlib.patches import Polygon as MplPolygon
 from matplotlib.collections import PatchCollection
 from shapely.ops import snap
+from scipy.spatial import distance
+
+class vorCell:
+    def __init__(self, polygon, points, radius=180):  # Set a default radius for circles
+        self.polygon = polygon
+        self.points = points
+        self.circles = [Point(point).buffer(radius) for point in points]
+        
+def cellPointsFinder(polygon, points):
+    point = find_point_in_polygon(polygon)
+    distances = [distance.euclidean((p[0], p[1]), (point.x, point.y)) for p in points]
+    closest_indices = np.argsort(distances)[:2]
+    return [points[closest_indices[0]], points[closest_indices[1]]]
 
 def find_polygons_from_lines(lines, bbox):
     # Step 1: Add bounding box lines
@@ -30,8 +45,25 @@ def find_polygons_from_lines(lines, bbox):
     
     return polygons
 
+def find_point_in_polygon(polygon):
+    """
+    Returns a point inside the given polygon. 
+    The centroid is used as the point inside the polygon.
+    """
+    # Calculate the centroid
+    centroid = polygon.centroid
+    
+    # Check if the centroid is inside the polygon
+    if polygon.contains(centroid):
+        return centroid
+    else:
+        # If not, use another method, like taking a vertex or an interior point
+        return polygon.representative_point()  # Guaranteed to be inside the polygon
+
 # Define the bounding box (xmin, ymin, xmax, ymax)
 bbox = [0, 0, 800, 600]
+
+points = [[92, 129], [477, 471], [323, 186], [554, 300], [708, 414]]
 
 # Using your specific set of lines:
 lines = [
@@ -49,6 +81,11 @@ lines = [
 ]
 
 polygons = find_polygons_from_lines(lines, bbox)
+
+vorCells = []
+for polygon in polygons:
+    cellPoints = cellPointsFinder(polygon, points)
+    vorCells.append(vorCell(polygon, cellPoints))
 
 # Check how many polygons were detected
 print(f"Number of polygons found: {len(polygons)}")
@@ -78,4 +115,37 @@ for line in lines:
 ax.set_xlim(0, 800)
 ax.set_ylim(0, 600)
 plt.gca().set_aspect('equal', adjustable='box')
+plt.show()
+
+# Create a plot and add the polygons, circles, and points
+fig, ax = plt.subplots()
+
+for cell in vorCells:
+    # Convert Shapely polygon to Matplotlib patch
+    exterior_coords = np.array(cell.polygon.exterior.coords)
+    mpl_poly = MplPolygon(exterior_coords, closed=True, edgecolor='black', facecolor='none')
+    ax.add_patch(mpl_poly)
+    
+    if len(cell.circles) > 1:
+        # Draw the circumferences of both circles with black edges and reduced thickness
+        ax.plot(*cell.circles[0].exterior.xy, color='black', linewidth=0.8, alpha=0.8)
+        ax.plot(*cell.circles[1].exterior.xy, color='black', linewidth=0.8, alpha=0.8)
+        
+        # Find and fill the intersection of the two circles
+        intersection = cell.circles[0].intersection(cell.circles[1])
+        if not intersection.is_empty:
+            if isinstance(intersection, MultiLineString):  # Handle case where intersection is complex
+                for geom in intersection.geoms:
+                    x, y = geom.exterior.xy
+                    ax.fill(x, y, color='green', alpha=1)
+            else:
+                x, y = intersection.exterior.xy
+                ax.fill(x, y, color='green', alpha=1)
+
+# Set limits and aspect ratio
+plt.xlim(0, 800)
+plt.ylim(0, 600)
+plt.gca().set_aspect('equal', adjustable='box')
+
+# Show the plot
 plt.show()
