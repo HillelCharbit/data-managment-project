@@ -50,6 +50,7 @@ vorCells = [
 fig, ax = plt.subplots()
 
 for cell in vorCells:
+
     ax.add_patch(cell.polygon)
     
     if len(cell.circles) > 1:
