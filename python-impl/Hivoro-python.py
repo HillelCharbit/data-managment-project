@@ -139,9 +139,9 @@ class Hivoro:
                         y1_int = int(self.bisector_y[k - 1] + 0.5)
                         x2_int = int(self.bisector_x[next_ - 1] + 0.5)
                         y2_int = int(self.bisector_y[next_ - 1] + 0.5)
-                        # if closer_points_count == 2:
-                        ax.plot([x1_int, x2_int], [y1_int, y2_int], color=self.line_colors[closer_points_count])
-                        self.lines.append([x1_int, y1_int, x2_int, y2_int])
+                        if closer_points_count == 1:
+                            ax.plot([x1_int, x2_int], [y1_int, y2_int], color=self.line_colors[closer_points_count])
+                            self.lines.append([x1_int, y1_int, x2_int, y2_int])
 
         plt.show()
 
@@ -176,8 +176,16 @@ if __name__ == "__main__":
     
     hivoro = Hivoro(data)
     
+    
+    
+        
     hivoro.plot()
     plt.show()
+    
+    lines = []
+    for line in hivoro.lines:
+        lines.append(LineString([line[:2], line[2:]]))
+        print(line)
     
 # ############################################################################################################
 
