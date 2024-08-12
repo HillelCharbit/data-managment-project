@@ -216,7 +216,7 @@ def find_point_in_polygon(polygon):
 
 if __name__ == "__main__":
     csv_file = "C:\\Users\\ASUS\\Downloads\\Food_Inspections_-_1_1_2010_-_6_30_2018_20240704.csv"
-    k = 55  # Number of lines to read
+    k = 100  # Number of lines to read
     
     # Load the CSV file without headers
     data = pd.read_csv(csv_file, header=None)
@@ -224,65 +224,67 @@ if __name__ == "__main__":
     data = data.iloc[:k, :2]
     # Normalize the data
     data = normalize_data(data.to_numpy())
+    
+     # Replace every value of 0 with 10^-8
     data[data == 0] = 0.00000001
-
-    
-    
-    hivoro = Hivoro(data)
+    for i in range(len(data)):
+        print(i, data[i])
+    # print(data[58])
+    # hivoro = Hivoro(data)
     
        
-    hivoro.plot()
-    plt.show()
+    # hivoro.plot()
+    # plt.show()
     
-    lines = []
-    for line in hivoro.lines:
-        lines.append(LineString([line[:2], line[2:]]))
+#     lines = []
+#     for line in hivoro.lines:
+#         lines.append(LineString([line[:2], line[2:]]))
      
-    # Define the bounding box (xmin, ymin, xmax, ymax)
-    bbox = [0, 0, 800, 800]
+#     # Define the bounding box (xmin, ymin, xmax, ymax)
+#     bbox = [0, 0, 800, 800]
 
-    polygons = find_polygons_from_lines(lines, bbox)
-    points = []
-    for k in range(hivoro.num_points):
-        x = data[k][0] * (hivoro.width - 30) + 15
-        y = data[k][1] * (hivoro.height - 30) + 15
-        points.append((x, y))
+#     polygons = find_polygons_from_lines(lines, bbox)
+#     points = []
+#     for k in range(hivoro.num_points):
+#         x = data[k][0] * (hivoro.width - 30) + 15
+#         y = data[k][1] * (hivoro.height - 30) + 15
+#         points.append((x, y))
         
-    vorCells = []
-    for polygon in polygons:
-        cellPoints = cellPointsFinder(polygon, points)
-        vorCells.append(vorCell(polygon, cellPoints))
-        print(cellPoints)
+#     vorCells = []
+#     for polygon in polygons:
+#         cellPoints = cellPointsFinder(polygon, points)
+#         vorCells.append(vorCell(polygon, cellPoints))
+#         print(cellPoints)
 
-# Create a plot and add the polygons, circles, and points
-fig, ax = plt.subplots()
+# # Create a plot and add the polygons, circles, and points
+# fig, ax = plt.subplots()
 
-for cell in vorCells:
-    # Convert Shapely polygon to Matplotlib patch
-    exterior_coords = np.array(cell.polygon.exterior.coords)
-    mpl_poly = MplPolygon(exterior_coords, closed=True, edgecolor='black', facecolor='red', alpha=0.3)
-    ax.add_patch(mpl_poly)
+# for cell in vorCells:
+#     # Convert Shapely polygon to Matplotlib patch
+#     exterior_coords = np.array(cell.polygon.exterior.coords)
+#     mpl_poly = MplPolygon(exterior_coords, closed=True, edgecolor='black', facecolor='red', alpha=0.3)
+#     ax.add_patch(mpl_poly)
     
-    if len(cell.circles) > 1:
-        # Draw the circumferences of both circles with black edges and reduced thickness
-        ax.plot(*cell.circles[0].exterior.xy, color='black', linewidth=0.8, alpha=0.8)
-        ax.plot(*cell.circles[1].exterior.xy, color='black', linewidth=0.8, alpha=0.8)
+#     if len(cell.circles) > 1:
+#         # Draw the circumferences of both circles with black edges and reduced thickness
+#         ax.plot(*cell.circles[0].exterior.xy, color='black', linewidth=0.8, alpha=0.8)
+#         ax.plot(*cell.circles[1].exterior.xy, color='black', linewidth=0.8, alpha=0.8)
         
-        # Find and fill the intersection of the two circles
-        intersection = cell.circles[0].intersection(cell.circles[1])
-        if not intersection.is_empty:
-            if isinstance(intersection, MultiLineString):  # Handle case where intersection is complex
-                for geom in intersection.geoms:
-                    x, y = geom.exterior.xy
-                    ax.fill(x, y, color='green', alpha=1)
-            else:
-                x, y = intersection.exterior.xy
-                ax.fill(x, y, color='green', alpha=1)
+#         # Find and fill the intersection of the two circles
+#         intersection = cell.circles[0].intersection(cell.circles[1])
+#         if not intersection.is_empty:
+#             if isinstance(intersection, MultiLineString):  # Handle case where intersection is complex
+#                 for geom in intersection.geoms:
+#                     x, y = geom.exterior.xy
+#                     ax.fill(x, y, color='green', alpha=1)
+#             else:
+#                 x, y = intersection.exterior.xy
+#                 ax.fill(x, y, color='green', alpha=1)
                 
-# Set limits and aspect ratio
-plt.xlim(0, 800)
-plt.ylim(0, 800)
-plt.gca().set_aspect('equal', adjustable='box')
+# # Set limits and aspect ratio
+# plt.xlim(0, 800)
+# plt.ylim(0, 800)
+# plt.gca().set_aspect('equal', adjustable='box')
 
-# Show the plot
-plt.show()
+# # Show the plot
+# plt.show()
