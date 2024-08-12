@@ -10,7 +10,7 @@ from Polygon import Polygon
 
 if __name__ == "__main__":
     csv_file = "C:\\Users\\ASUS\\Downloads\\Food_Inspections_-_1_1_2010_-_6_30_2018_20240704.csv"
-    num_points = 20  # Number of lines to read
+    num_points = 50  # Number of lines to read
     rho = 0.1  # Threshold for coverage
     order = 2  # Order of Voronoi, number of points to cover
     frame_width = 800
@@ -61,6 +61,9 @@ if __name__ == "__main__":
                 else:
                     x, y = intersection.exterior.xy
                     ax.fill(x, y, color='green', alpha=1)
+                    
+        plt.draw()  # Refresh the plot
+        plt.pause(0.1)  # Pause to allow the update to be visible
                     
     # Set limits and aspect ratio
     plt.xlim(0, frame_width)

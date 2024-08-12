@@ -1,11 +1,7 @@
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.spatial import voronoi_plot_2d
 from scipy.spatial import Voronoi
-from shapely.geometry import Point, Polygon
-from matplotlib.patches import Polygon as MplPolygon
-from matplotlib.collections import PatchCollection
 
 def normalize_data(data):
     if len(data) == 0:
@@ -37,38 +33,10 @@ data = normalize_data(data.to_numpy())
 # Create a Voronoi object
 vor = Voronoi(data)
 
-# Initialize a plot
+# Plot the Voronoi diagram
 fig, ax = plt.subplots()
+voronoi_plot_2d(vor, ax=ax)
 
-# List to store Matplotlib polygons
-mpl_polygons = []
-
-# Iterate over the Voronoi regions
-for region_index in vor.point_region:
-    region = vor.regions[region_index]
-    
-    if not region or -1 in region:
-        continue  # Skip empty regions and those with points at infinity
-
-    # Get the coordinates of the Voronoi vertices for this region
-    polygon = Polygon([vor.vertices[i] for i in region])
-    
-    # Convert the Shapely polygon to a Matplotlib Polygon
-    mpl_polygon = MplPolygon(np.array(polygon.exterior.coords), closed=True)
-    mpl_polygons.append(mpl_polygon)
-
-# Add the Voronoi polygons to the plot
-p = PatchCollection(mpl_polygons, edgecolor='black', facecolor='none', linewidths=1)
-ax.add_collection(p)
-
-# Plot the original points
-ax.plot(data[:, 0], data[:, 1], 'ro')
-
-# Set the limits for the plot
-ax.set_xlim(vor.min_bound[0] - 0.1, vor.max_bound[0] + 0.1)
-ax.set_ylim(vor.min_bound[1] - 0.1, vor.max_bound[1] + 0.1)
-
-# Display the plot
 plt.show()
 
 
