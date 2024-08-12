@@ -15,7 +15,6 @@ public class Hivoro extends JPanel {
     double[] bisectorX = new double[100000];
     double[] bisectorY = new double[100000];
     double[] unused = new double[100000];
-    Cell[] cells;
 
     public Hivoro(double[][] data) {
         this.data = data;
@@ -30,7 +29,6 @@ public class Hivoro extends JPanel {
         width = 800;
         height = 600;
         numPoints = data.length;
-        cells = new Cell[numPoints * (numPoints - 1) / 2 ];
 
         for (int k = 0; k < numPoints; k++) {
             xCoords[k] = data[k][0] * (width - 30) + 15;
@@ -109,8 +107,6 @@ public class Hivoro extends JPanel {
         for (int k = 0; k < numPoints; k++) {
             g.fillOval(xIntCoords[k] - 2, yIntCoords[k] - 2, 4, 4);
         }
-
-        int cellIndex = 0;
         
         for (int i = 1; i <= numPoints - 1; i++) {
             for (int j = i + 1; j <= numPoints; j++) {
@@ -204,16 +200,14 @@ public class Hivoro extends JPanel {
 
     public static void main(String[] args) {
         CSVReader reader = new CSVReader();
-        String csvFile = "C:\\Users\\danie\\Food_Inspections_-_1_1_2010_-_6_30_2018_20240704.csv";
+        String csvFile = "C:\\Users\\ASUS\\Downloads\\Food_Inspections_-_1_1_2010_-_6_30_2018_20240704.csv";
         int k = 10; // Number of lines to read
         double[][] data = reader.readCSV(csvFile, k);
 
-        // Prompt the user for the value of k
-        String kStr = JOptionPane.showInputDialog("Enter the value of k:");
-        int kValue = Integer.parseInt(kStr);
+        
 
         // Create UncoveredRegion2D instance and add points from data
-        UncoveredRegion2D ur = new UncoveredRegion2D(0.1, kValue);
+        UncoveredRegion2D ur = new UncoveredRegion2D(0.1, 2);
         for (double[] point : data) {
             ur.addPoint(point[0], point[1]);
         }
@@ -222,11 +216,7 @@ public class Hivoro extends JPanel {
         JFrame frame = new JFrame("Hivoro and Uncovered Regions Visualization");
 
         // Add the Voronoi panel
-        long startTime = System.nanoTime();
         Hivoro hivoro = new Hivoro(data);
-        long endTime = System.nanoTime();
-        long totalTime = (endTime - startTime) / 1000000;
-        System.out.println(totalTime);
         frame.add(hivoro);
 
         // Create and add the uncovered regions visualization panel
