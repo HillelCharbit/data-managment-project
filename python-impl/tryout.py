@@ -14,7 +14,6 @@ class vorCell:
         self.circles = [Point(point).buffer(radius) for point in points]
 
 def cell_points_finder(polygon, points):
-    # point = find_point_in_polygon(polygon)
     point = polygon.representative_point()
     distances = [distance.euclidean((p[0], p[1]), (point.x, point.y)) for p in points]
     closest_indices = np.argsort(distances)[:2]
@@ -43,23 +42,19 @@ def find_point_in_polygon(polygon):
     else:
         return polygon.representative_point()
 
+def generate_random_lines(k, bbox):
+    lines = []
+    for _ in range(k):
+        x1, y1 = np.random.uniform(bbox[0], bbox[2]), np.random.uniform(bbox[1], bbox[3])
+        x2, y2 = np.random.uniform(bbox[0], bbox[2]), np.random.uniform(bbox[1], bbox[3])
+        lines.append(LineString([(x1, y1), (x2, y2)]))
+    return lines
+
 bbox = [0, 0, 800, 600]
 points = [[92, 129], [477, 471], [323, 186], [554, 300], [708, 414]]
+k = 1000  # Number of random lines to generate
 
-lines = [
-    LineString([(98, 600), (129, 475)]),
-    LineString([(296, 287), (402, 0)]),
-    LineString([(129, 475), (296, 287)]),
-    LineString([(262, 600), (395, 331)]),
-    LineString([(0, 545), (129, 475)]),
-    LineString([(395, 331), (545, 250)]),
-    LineString([(545, 250), (693, 0)]),
-    LineString([(296, 287), (395, 331)]),
-    LineString([(586, 417), (800, 514)]),
-    LineString([(451, 600), (586, 417)]),
-    LineString([(545, 250), (586, 417)])
-]
-
+lines = generate_random_lines(k, bbox)
 polygons = find_polygons_from_lines(lines, bbox)
 
 vorCells = []
@@ -74,8 +69,8 @@ for cell in vorCells:
     mpl_poly = MplPolygon(exterior_coords, closed=True, edgecolor='black', facecolor='red', alpha=0.3)
     ax.add_patch(mpl_poly)
     
-    plt.draw()  # Refresh the plot
-    plt.pause(0.1)  # Pause to allow the update to be visible
+    # plt.draw()  # Refresh the plot
+    # plt.pause(0.1)  # Pause to allow the update to be visible
     
     if len(cell.circles) > 1:
         ax.plot(*cell.circles[0].exterior.xy, color='black', linewidth=0.8, alpha=0.8)
@@ -91,8 +86,8 @@ for cell in vorCells:
                 x, y = intersection.exterior.xy
                 ax.fill(x, y, color='green', alpha=1)
         
-        plt.draw()  # Refresh the plot
-        plt.pause(0.5)  # Pause to allow the update to be visible
+        # plt.draw()  # Refresh the plot
+        # plt.pause(0.5)  # Pause to allow the update to be visible
 
 plt.xlim(0, 800)
 plt.ylim(0, 600)

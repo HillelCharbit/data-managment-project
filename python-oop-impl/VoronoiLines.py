@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 from shapely.geometry import LineString, MultiLineString
 from shapely.ops import polygonize, unary_union, snap
 
+MAX_POINTS = 100000
+FRAME_EDGE = 15
 
 class Hivoro:
     def __init__(self, data, order, width=800, height=800):
@@ -14,20 +16,20 @@ class Hivoro:
         self.height = height
         self.num_points = len(data)
         self.lines = []
-        self.order = order - 1
+        self.order = order - 1 # Subtract 1 to account for 0-based indexing
 
-        self.x_coords = np.zeros(100000)
-        self.y_coords = np.zeros(100000)
-        self.x_int_coords = np.zeros(100000, dtype=int)
-        self.y_int_coords = np.zeros(100000, dtype=int)
-        self.distances = np.zeros(100000)
-        self.bisector_x = np.zeros(100000)
-        self.bisector_y = np.zeros(100000)
-        self.unused = np.zeros(100000)
+        self.x_coords = np.zeros(MAX_POINTS)
+        self.y_coords = np.zeros(MAX_POINTS)
+        self.x_int_coords = np.zeros(MAX_POINTS, dtype=int)
+        self.y_int_coords = np.zeros(MAX_POINTS, dtype=int)
+        self.distances = np.zeros(MAX_POINTS)
+        self.bisector_x = np.zeros(MAX_POINTS)
+        self.bisector_y = np.zeros(MAX_POINTS)
+        self.unused = np.zeros(MAX_POINTS)
 
         for k in range(self.num_points):
-            self.x_coords[k] = data[k][0] * (self.width - 30) + 15
-            self.y_coords[k] = data[k][1] * (self.height - 30) + 15
+            self.x_coords[k] = data[k][0] * (self.width - 2*FRAME_EDGE) + FRAME_EDGE
+            self.y_coords[k] = data[k][1] * (self.height - 2*FRAME_EDGE) + FRAME_EDGE
             self.x_int_coords[k] = int(self.x_coords[k] + 0.5)
             self.y_int_coords[k] = int(self.y_coords[k] + 0.5)
             self.distances[k] = np.sqrt(self.x_coords[k] ** 2 + self.y_coords[k] ** 2)
@@ -138,11 +140,12 @@ class Hivoro:
                         y1_int = int(self.bisector_y[k - 1] + 0.5)
                         x2_int = int(self.bisector_x[next_ - 1] + 0.5)
                         y2_int = int(self.bisector_y[next_ - 1] + 0.5)
+                        
                         if closer_points_count == self.order:
                             ax.plot([x1_int, x2_int], [y1_int, y2_int], color=self.line_colors[closer_points_count])
                             self.lines.append([x1_int, y1_int, x2_int, y2_int])
 
-        plt.show()
+        # plt.show()
     
     def get_lines(self):
         lines = []

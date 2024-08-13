@@ -31,7 +31,8 @@ class Polygon(MplPolygon):
     
     @staticmethod
     def cell_points_finder(polygon, points, order):
-        point = polygon.centroid
+        # point = polygon.centroid
+        point = polygon.representative_point()
         distances = [distance.euclidean((p[0], p[1]), (point.x, point.y)) for p in points]
         closest_indices = np.argsort(distances)[:order]
         return [points[i] for i in closest_indices]

@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
 from shapely.geometry import MultiLineString
+import time
 
 from DataManager import DataManager 
 from VoronoiLines import Hivoro  
@@ -10,17 +11,17 @@ from Polygon import Polygon
 
 if __name__ == "__main__":
     csv_file = "C:\\Users\\ASUS\\Downloads\\Food_Inspections_-_1_1_2010_-_6_30_2018_20240704.csv"
-    num_points = 50  # Number of lines to read
-    rho = 0.1  # Threshold for coverage
-    order = 2  # Order of Voronoi, number of points to cover
+    num_points = 50 # Number of lines to read
+    rho = 0.3  # Threshold for coverage
+    order = 3  # Order of Voronoi, number of points to cover
     frame_width = 800
     frame_height = 800
     
     data_manager = DataManager(csv_file, num_points)  # Instantiate the DataManager class with 'n' as order
     data = data_manager.normalize_data()
-
-    hivoro = Hivoro(data, order)  
     
+    start = time.time_ns()
+    hivoro = Hivoro(data, order)  
     hivoro.plot()
     lines = hivoro.get_lines()
     
@@ -72,4 +73,5 @@ if __name__ == "__main__":
 
     # Show the plot
     plt.show()
-    print("Done")
+    end = time.time_ns()
+    print("Done", (end - start) , "ns")
