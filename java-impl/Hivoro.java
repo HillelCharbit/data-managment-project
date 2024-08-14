@@ -190,8 +190,10 @@ public class Hivoro extends JPanel {
                         int y1Int = (int) (bisectorY[k - 1] + 0.5);
                         int x2Int = (int) (bisectorX[next - 1] + 0.5);
                         int y2Int = (int) (bisectorY[next - 1] + 0.5);
+                        // if(closerPointsCount == 1){
                         g.setColor(lineColors[closerPointsCount]);
                         g.drawLine(x1Int, y1Int, x2Int, y2Int);
+                    // }
                     }
                 }
             }
