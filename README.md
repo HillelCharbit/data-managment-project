@@ -1,6 +1,3 @@
-Certainly! Here’s the README in a format ready for copy-pasting:
-
----
 
 # Voronoi Unrepresented Data Identifier
 
